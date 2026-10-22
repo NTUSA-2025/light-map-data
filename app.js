@@ -222,17 +222,32 @@ function startRecording() {
   void recordOnce();
 }
 
+function formatTaipeiTime(isoTime) {
+  const date = new Date(isoTime);
+  const parts = Object.fromEntries(new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Taipei",
+    hourCycle: "h23",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+  }).formatToParts(date).map(({ type, value }) => [type, value]));
+  return `${parts.year}-${parts.month}-${parts.day}T${parts.hour}:${parts.minute}:${parts.second}+08:00`;
+}
+
 async function exportCsv() {
   try {
     const rows = await getRows();
     if (rows.length === 0) return;
-    const header = "session_id,recorded_at,latitude,longitude,accuracy_m,lux";
-    const lines = rows.map((row) => [row.session_id, row.recorded_at, row.latitude, row.longitude, row.accuracy_m, row.lux].join(","));
+    const header = "session_id,recorded_at,recorded_at_taipei,latitude,longitude,accuracy_m,lux";
+    const lines = rows.map((row) => [row.session_id, row.recorded_at, formatTaipeiTime(row.recorded_at), row.latitude, row.longitude, row.accuracy_m, row.lux].join(","));
     const blob = new Blob(["\uFEFF", header, "\r\n", lines.join("\r\n"), "\r\n"], { type: "text/csv;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
-    link.download = `esp32-lux-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.download = `esp32-lux-${formatTaipeiTime(new Date().toISOString()).slice(0, 10)}.csv`;
     document.body.append(link);
     link.click();
     link.remove();
