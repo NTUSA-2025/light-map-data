@@ -4,39 +4,38 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#f5f3ed">
-    <meta name="description" content="用手機接收 ESP32 與 VEML7700 的照度，加上定位並匯出 CSV。">
-    <title>光跡｜ESP32 亮度紀錄器</title>
+    <meta name="description" content="記錄台大校園的照度與位置。">
+    <title>NTU Light Map</title>
     <link rel="stylesheet" href="style.css">
     <script src="app.js" defer></script>
   </head>
   <body>
     <main class="shell">
       <header class="masthead">
-        <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>光跡 <small>LIGHT LOG</small></span></div>
+        <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><span>台大亮度地圖 <small>NTU LUX MAP</small></span></div>
         <span class="project-tag">ESP32 × VEML7700</span>
       </header>
 
       <div class="intro">
-        <p class="eyebrow">口袋裡的光線實驗室</p>
-        <h1>把每一道光，<br>記成一段旅程<span class="period">.</span></h1>
-        <p>連上感測器，讓手機替每筆照度加上時間與位置。</p>
+        <h1>帶著他，去追一隻螢火蟲<span class="period">.</span></h1>
+        <p>紀錄台大校園的亮度</p>
       </div>
 
       <section class="hero" aria-label="目前亮度">
         <div class="hero-glow" aria-hidden="true"></div>
         <div class="hero-top"><span class="hero-label">即時照度 <span class="live-dot" aria-hidden="true"></span></span><span id="bleStatus" class="hero-status">尚未連線</span></div>
         <div class="lux-line"><strong id="luxValue">—</strong><span>lux</span></div>
-        <p class="hero-note">遮住感測器或照一盞燈，看數字怎麼變。</p>
+        <p class="hero-note">目前測得的照度。</p>
         <button id="connectButton" type="button" class="button button-bright"><span id="connectLabel">連接 ESP32_LUX</span><span aria-hidden="true">↗</span></button>
       </section>
 
-      <div class="section-heading"><span>開始採集</span><span>01 — 02</span></div>
+      <div class="section-heading"><span>開始測量</span><span>01 — 02</span></div>
 
       <section class="panel" aria-label="定位">
         <div class="panel-icon" aria-hidden="true">◎</div>
         <div class="panel-main">
           <div class="panel-head"><h2>手機定位</h2><span id="locationStatus" class="status-pill">尚未取得</span></div>
-          <p id="coordinates" class="detail">啟用定位，紀錄才知道光線在哪裡。</p>
+          <p id="coordinates" class="detail">為紀錄加上位置。</p>
           <button id="locationButton" type="button" class="button button-outline">啟用定位 <span aria-hidden="true">↗</span></button>
         </div>
       </section>
