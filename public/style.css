@@ -84,10 +84,32 @@ button { -webkit-tap-highlight-color: transparent; }
 
 .panel { padding: 20px; background: linear-gradient(150deg, var(--surface-raised), var(--surface) 70%); box-shadow: inset 0 1px #ffffff08; }
 .location-panel { grid-area: location; display: flex; flex-direction: column; justify-content: space-between; min-height: 122px; }
+.dashboard.map-open { grid-template-areas: "hero record" "location location"; }
 .record-panel { grid-area: record; display: flex; flex-direction: column; }
 .location-content { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
 .detail { min-width: 0; margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.5; overflow-wrap: anywhere; }
 .location-content .button { flex: none; }
+.map-toggle { display: inline-flex; align-items: center; gap: 2px; min-height: 32px; padding: 0; border: 0; color: var(--ink); background: transparent; font: inherit; font-weight: inherit; text-align: left; cursor: pointer; }
+.map-toggle:focus-visible { outline: 2px solid var(--cyan); outline-offset: 3px; }
+.map-toggle-label { margin-left: 7px; color: var(--cyan); font-size: .68rem; font-weight: 600; }
+.map-chevron { margin-left: 3px; color: var(--cyan); font-size: 1.2rem; line-height: 1; transition: transform .15s ease; }
+.map-toggle[aria-expanded="true"] .map-chevron { transform: rotate(180deg); }
+.map-panel { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.map-toolbar, .map-legend { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px 12px; }
+.map-toolbar { margin-bottom: 10px; }
+.map-toolbar strong { color: var(--cyan); font-family: var(--mono); font-size: .81rem; font-weight: 500; }
+.map-toolbar .button { min-height: 36px; padding: 7px 10px; font-size: .73rem; }
+.coverage-map { width: 100%; height: min(48vh, 430px); min-height: 290px; overflow: hidden; border: 1px solid var(--line); border-radius: 6px; background: #0a1114; }
+.map-legend { justify-content: flex-start; margin-top: 10px; color: var(--muted); font-size: .73rem; }
+.map-legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend-swatch { width: 12px; height: 12px; border: 1px solid #dce7e4; border-radius: 2px; background: #15202366; }
+.legend-swatch.covered { border-color: var(--cyan); background: var(--cyan); }
+.legend-swatch.road { height: 0; border: 0; border-top: 2px solid var(--orange); border-radius: 0; background: transparent; }
+.legend-swatch.current { width: 11px; height: 11px; border: 2px solid #fff; border-radius: 50%; background: var(--orange); }
+.map-status { min-height: 1.3em; margin: 8px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.map-status.error { color: var(--orange); }
+.coverage-map.leaflet-container { font-family: var(--font); }
+.coverage-map .leaflet-control-attribution { font-size: 10px; }
 
 .record-hint { margin: 7px 0 0; color: var(--muted); font-size: .73rem; line-height: 1.4; }
 .record-controls { display: grid; grid-template-columns: minmax(112px, .85fr) minmax(0, 1.5fr); align-items: end; gap: 10px; margin-top: 18px; }
@@ -128,6 +150,7 @@ footer { margin-top: 16px; padding: 12px 2px 0; border-top: 1px solid var(--line
   .masthead { padding-bottom: 13px; }
   .project-tag { display: none; }
   .dashboard { grid-template-columns: minmax(0, 1fr); grid-template-areas: "hero" "location" "record"; margin-top: 13px; }
+  .dashboard.map-open { grid-template-areas: "hero" "location" "record"; }
   .hero { min-height: 155px; padding: 16px; }
   .lux-line strong { font-size: clamp(3.2rem, 13vw, 4.5rem); }
   .lux-line strong.compact { font-size: clamp(2.2rem, 8.5vw, 3.3rem); }
@@ -136,6 +159,7 @@ footer { margin-top: 16px; padding: 12px 2px 0; border-top: 1px solid var(--line
   .record-controls { margin-top: 14px; }
   .archive { margin-top: 15px; padding-top: 13px; }
   .recent-list { grid-template-columns: 1fr; }
+  .coverage-map { height: min(45vh, 360px); min-height: 260px; }
 }
 
 @media (max-width: 720px) and (max-height: 700px) {
@@ -174,5 +198,5 @@ footer { margin-top: 16px; padding: 12px 2px 0; border-top: 1px solid var(--line
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .button { transition: none; }
+  .button, .map-chevron { transition: none; }
 }

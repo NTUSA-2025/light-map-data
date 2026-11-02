@@ -8,6 +8,7 @@
     <title>照度資料採集｜台大夜間亮度地圖</title>
     <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="style.css">
+    <script src="coverage-map.js" defer></script>
     <script src="app.js" defer></script>
   </head>
   <body>
@@ -27,10 +28,16 @@
         </section>
 
         <section class="panel location-panel" aria-labelledby="locationHeading">
-          <div class="panel-head"><h2 id="locationHeading"><span class="card-number">02</span> 採集位置</h2><span id="locationStatus" class="status-pill">尚未取得</span></div>
+          <div class="panel-head"><h2 id="locationHeading"><button id="mapToggle" class="map-toggle" type="button" aria-expanded="false" aria-controls="mapPanel"><span class="card-number">02</span> 採集位置 <span class="map-toggle-label">地圖</span><span class="map-chevron" aria-hidden="true">⌄</span></button></h2><span id="locationStatus" class="status-pill">尚未取得</span></div>
           <div class="location-content">
             <p id="coordinates" class="detail">啟用定位，為每筆照度紀錄加上座標。</p>
             <button id="locationButton" type="button" class="button button-outline"><span id="locationLabel">啟用定位</span><span aria-hidden="true">↗</span></button>
+          </div>
+          <div id="mapPanel" class="map-panel" hidden>
+            <div class="map-toolbar"><strong id="coverageCount">已覆蓋 0 / 501 格</strong><button id="recenterButton" type="button" class="button button-outline" disabled>回到目前位置</button></div>
+            <div id="coverageMap" class="coverage-map" role="region" aria-label="台大主要道路格覆蓋地圖"></div>
+            <div class="map-legend"><span><i class="legend-swatch uncovered" aria-hidden="true"></i>尚未測量</span><span><i class="legend-swatch covered" aria-hidden="true"></i>已覆蓋</span><span><i class="legend-swatch road" aria-hidden="true"></i>主要道路</span><span><i class="legend-swatch current" aria-hidden="true"></i>目前位置</span></div>
+            <p id="mapStatus" class="map-status" role="status" aria-live="polite"></p>
           </div>
         </section>
 

@@ -14,6 +14,11 @@ const stopButton = el("stopButton");
 const exportButton = el("exportButton");
 const clearButton = el("clearButton");
 const intervalSelect = el("intervalSelect");
+const mapToggle = el("mapToggle");
+const mapPanel = el("mapPanel");
+const locationPanel = document.querySelector(".location-panel");
+const recenterButton = el("recenterButton");
+const coverageMap = window.LuxCoverageMap;
 
 let device = null;
 let characteristic = null;
@@ -25,6 +30,7 @@ let sessionId = null;
 let saving = false;
 let clearing = false;
 let storedCount = 0;
+let mapLoading = false;
 
 function message(text, error = false) {
   el("message").textContent = text;
@@ -40,7 +46,8 @@ function updateControls() {
   connectButton.disabled = connected;
   locationButton.disabled = locationWatchId !== null;
   exportButton.disabled = storedCount === 0 || clearing;
-  clearButton.disabled = storedCount === 0 || recording || saving || clearing;
+  clearButton.disabled = storedCount === 0 || recording || saving || clearing || mapLoading;
+  recenterButton.disabled = latestPosition === null || !coverageMap.isReady();
   el("connectLabel").textContent = connected ? "已連接 ESP32_LUX" : "連接 ESP32_LUX";
   el("locationLabel").textContent = locationWatchId === null ? "啟用定位" : latestPosition === null ? "定位中…" : "定位已啟用";
   el("bleStatus").textContent = connected ? "已連線" : "尚未連線";
@@ -130,6 +137,7 @@ function enableLocation() {
       latestPosition = position;
       el("locationStatus").textContent = "已取得";
       el("coordinates").textContent = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)} · 誤差約 ${Math.round(position.coords.accuracy)} 公尺`;
+      coverageMap.setPosition(position);
       updateControls();
     },
     (error) => {
@@ -138,6 +146,7 @@ function enableLocation() {
       locationWatchId = null;
       el("locationStatus").textContent = "無法定位";
       el("coordinates").textContent = "無法取得目前位置，請重新啟用定位。";
+      coverageMap.setPosition(null);
       message(`定位失敗：${error.message}`, true);
       updateControls();
     },
@@ -196,6 +205,27 @@ async function getRows() {
     });
   } finally {
     db.close();
+  }
+}
+
+async function toggleMap() {
+  const opening = mapPanel.hidden;
+  mapPanel.hidden = !opening;
+  mapToggle.setAttribute("aria-expanded", String(opening));
+  document.querySelector(".dashboard").classList.toggle("map-open", opening);
+  if (!opening || mapLoading) return;
+  mapLoading = true;
+  updateControls();
+  el("mapStatus").textContent = "正在載入台大地圖與道路格…";
+  el("mapStatus").classList.remove("error");
+  try {
+    await coverageMap.open(getRows, latestPosition);
+  } catch (error) {
+    el("mapStatus").textContent = `地圖載入失敗：${error.message}`;
+    el("mapStatus").classList.add("error");
+  } finally {
+    mapLoading = false;
+    updateControls();
   }
 }
 
@@ -263,14 +293,16 @@ async function recordOnce() {
   }
   saving = true;
   try {
-    await saveRow({
+    const row = {
       session_id: sessionId,
       recorded_at: new Date().toISOString(),
       latitude: latestPosition.coords.latitude,
       longitude: latestPosition.coords.longitude,
       accuracy_m: latestPosition.coords.accuracy,
       lux: latestLux,
-    });
+    };
+    await saveRow(row);
+    coverageMap.record(row);
     await refreshArchive();
     message("已儲存最新一筆紀錄。");
   } catch (error) {
@@ -327,12 +359,13 @@ async function exportCsv() {
 }
 
 async function clearRecords() {
-  if (recordTimer !== null || saving || clearing || storedCount === 0) return;
+  if (recordTimer !== null || saving || clearing || mapLoading || storedCount === 0) return;
   if (!window.confirm(`確定刪除這支手機瀏覽器儲存的全部 ${storedCount} 筆紀錄嗎？刪除後無法復原，請先匯出 CSV。`)) return;
   clearing = true;
   updateControls();
   try {
     await clearRows();
+    coverageMap.clear();
     await refreshArchive();
     message("已刪除全部紀錄。");
   } catch (error) {
@@ -349,5 +382,10 @@ startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", () => stopRecording());
 exportButton.addEventListener("click", exportCsv);
 clearButton.addEventListener("click", clearRecords);
+mapToggle.addEventListener("click", toggleMap);
+locationPanel.addEventListener("click", (event) => {
+  if (mapPanel.hidden && !event.target.closest("button")) void toggleMap();
+});
+recenterButton.addEventListener("click", () => coverageMap.recenter());
 updateControls();
 refreshArchive().catch((error) => message(`無法開啟手機資料庫：${error.message}`, true));

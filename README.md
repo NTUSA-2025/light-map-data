@@ -12,6 +12,12 @@
 
 記錄會跨頁面重新開啟保留，但清除瀏覽器網站資料會移除它們。頁面必須保持開啟；Android 對背景網頁有限制，鎖屏長時間記錄需要日後做原生 App。若 GPS 定位超過 30 秒沒有更新，頁面會暫停寫入，避免把舊座標當成即時位置。
 
+## 地圖與道路覆蓋
+
+點開「採集位置」可查看台大地圖、目前位置與主要道路格。校園邊界、道路線和 501 個道路六角格分別複製自 `../ntu-light-map/data/ntu_area.geojson`、`ntu_road.geojson`、`hex_hit_with_safe.geojson`，存放於 `public/data/`。底圖使用 OpenStreetMap 圖磚，開啟地圖時需要網路連線。
+
+每筆成功儲存的紀錄若其 GPS 座標落在道路格內，該格就會標示為「已覆蓋」；同一格只計一次。覆蓋會隨記錄更新，重新開啟頁面時依本機紀錄還原，刪除全部紀錄後歸零。這是採樣位置參考，不代表整格各處的照度都相同。
+
 ## 部署到 Cloudflare Workers
 
 網站檔案放在 `public/`，`wrangler.jsonc` 使用 [Workers Static Assets](https://developers.cloudflare.com/workers/static-assets/) 發布，無需伺服器程式或 Cloudflare 資料庫。先安裝 Node.js，再在專案根目錄執行：
