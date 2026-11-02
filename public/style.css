@@ -109,8 +109,11 @@ select option { background: #0a1114; }
 .message.error { border-color: var(--orange); color: var(--orange); background: #f0997b0c; }
 .recent-records { margin-top: var(--card-gap); padding-top: 18px; }
 .recent-head { gap: 12px; flex-wrap: wrap; }
+.recent-tools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.recent-tools > span { color: var(--faint); font-size: .72rem; white-space: nowrap; }
+.button-danger { border-color: #70504b; color: var(--orange); background: #f0997b0b; }
+.button-danger:hover:not(:disabled) { border-color: var(--orange); background: #f0997b1a; }
 .section-kicker { color: var(--orange); font-family: var(--mono); font-size: .64rem; font-weight: 500; letter-spacing: .1em; }
-.recent-head > span { color: var(--faint); font-size: .72rem; white-space: nowrap; }
 .recent-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; margin: 13px 0 0; padding: 0; list-style: none; }
 .recent-list li { min-width: 0; padding: 11px 0; border-top: 1px solid var(--line); }
 .recent-row-head { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 3px 10px; }

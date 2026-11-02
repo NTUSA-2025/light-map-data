@@ -39,8 +39,8 @@
           <p id="recordHint" class="record-hint">連接照度計並啟用定位後即可開始。</p>
           <div class="record-controls">
             <div class="interval-field"><label for="intervalSelect">紀錄間隔</label><div class="select-wrap"><select id="intervalSelect">
-              <option value="1">每 1 秒</option>
-              <option value="5" selected>每 5 秒</option>
+              <option value="1" selected>每 1 秒</option>
+              <option value="5">每 5 秒</option>
               <option value="10">每 10 秒</option>
               <option value="30">每 30 秒</option>
             </select></div></div>
@@ -57,7 +57,7 @@
       </div>
 
       <section class="panel recent-records" aria-labelledby="recentHeading">
-        <div class="recent-head"><div><span class="section-kicker">LOCAL DATA</span><h2 id="recentHeading">最近採集紀錄</h2></div><span>台北時間 · 最多 10 筆</span></div>
+        <div class="recent-head"><div><span class="section-kicker">LOCAL DATA</span><h2 id="recentHeading">最近採集紀錄</h2></div><div class="recent-tools"><span>台北時間 · 最多 10 筆</span><button id="clearButton" type="button" class="button button-danger" disabled>刪除全部紀錄</button></div></div>
         <ol id="recentRows" class="recent-list"><li class="recent-empty">尚無紀錄</li></ol>
       </section>
 

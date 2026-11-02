@@ -12,6 +12,7 @@ const locationButton = el("locationButton");
 const startButton = el("startButton");
 const stopButton = el("stopButton");
 const exportButton = el("exportButton");
+const clearButton = el("clearButton");
 const intervalSelect = el("intervalSelect");
 
 let device = null;
@@ -22,6 +23,8 @@ let locationWatchId = null;
 let recordTimer = null;
 let sessionId = null;
 let saving = false;
+let clearing = false;
+let storedCount = 0;
 
 function message(text, error = false) {
   el("message").textContent = text;
@@ -36,6 +39,8 @@ function updateControls() {
   intervalSelect.disabled = recording;
   connectButton.disabled = connected;
   locationButton.disabled = locationWatchId !== null;
+  exportButton.disabled = storedCount === 0 || clearing;
+  clearButton.disabled = storedCount === 0 || recording || saving || clearing;
   el("connectLabel").textContent = connected ? "已連接 ESP32_LUX" : "連接 ESP32_LUX";
   el("locationLabel").textContent = locationWatchId === null ? "啟用定位" : latestPosition === null ? "定位中…" : "定位已啟用";
   el("bleStatus").textContent = connected ? "已連線" : "尚未連線";
@@ -165,6 +170,21 @@ async function saveRow(row) {
   }
 }
 
+async function clearRows() {
+  const db = await openDatabase();
+  try {
+    await new Promise((resolve, reject) => {
+      const tx = db.transaction(STORE_NAME, "readwrite");
+      tx.objectStore(STORE_NAME).clear();
+      tx.oncomplete = resolve;
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
+    });
+  } finally {
+    db.close();
+  }
+}
+
 async function getRows() {
   const db = await openDatabase();
   try {
@@ -199,8 +219,9 @@ async function refreshArchive() {
       tx.onerror = () => reject(tx.error);
       tx.onabort = () => reject(tx.error);
     });
+    storedCount = count;
     el("rowCount").textContent = count.toString();
-    exportButton.disabled = count === 0;
+    updateControls();
     const list = el("recentRows");
     if (rows.length === 0) {
       const empty = document.createElement("li");
@@ -256,6 +277,7 @@ async function recordOnce() {
     stopRecording(`儲存失敗：${error.message}`);
   } finally {
     saving = false;
+    updateControls();
   }
 }
 
@@ -304,10 +326,28 @@ async function exportCsv() {
   }
 }
 
+async function clearRecords() {
+  if (recordTimer !== null || saving || clearing || storedCount === 0) return;
+  if (!window.confirm(`確定刪除這支手機瀏覽器儲存的全部 ${storedCount} 筆紀錄嗎？刪除後無法復原，請先匯出 CSV。`)) return;
+  clearing = true;
+  updateControls();
+  try {
+    await clearRows();
+    await refreshArchive();
+    message("已刪除全部紀錄。");
+  } catch (error) {
+    message(`刪除失敗：${error.message}`, true);
+  } finally {
+    clearing = false;
+    updateControls();
+  }
+}
+
 connectButton.addEventListener("click", connect);
 locationButton.addEventListener("click", enableLocation);
 startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", () => stopRecording());
 exportButton.addEventListener("click", exportCsv);
+clearButton.addEventListener("click", clearRecords);
 updateControls();
 refreshArchive().catch((error) => message(`無法開啟手機資料庫：${error.message}`, true));
