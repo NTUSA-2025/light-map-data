@@ -4,6 +4,7 @@ const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
 const CHARACTERISTIC_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
 const DB_NAME = "esp32-lux-logger";
 const STORE_NAME = "readings";
+const RECENT_LIMIT = 10;
 
 const el = (id) => document.getElementById(id);
 const connectButton = el("connectButton");
@@ -168,17 +169,52 @@ async function getRows() {
   }
 }
 
-async function refreshCount() {
+async function refreshArchive() {
   const db = await openDatabase();
   try {
-    const count = await new Promise((resolve, reject) => {
+    const { count, rows } = await new Promise((resolve, reject) => {
       const tx = db.transaction(STORE_NAME, "readonly");
-      const request = tx.objectStore(STORE_NAME).count();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
+      const store = tx.objectStore(STORE_NAME);
+      const countRequest = store.count();
+      const cursorRequest = store.openCursor(null, "prev");
+      const recentRows = [];
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (cursor && recentRows.length < RECENT_LIMIT) {
+          recentRows.push(cursor.value);
+          if (recentRows.length < RECENT_LIMIT) cursor.continue();
+        }
+      };
+      tx.oncomplete = () => resolve({ count: countRequest.result, rows: recentRows });
+      tx.onerror = () => reject(tx.error);
+      tx.onabort = () => reject(tx.error);
     });
     el("rowCount").textContent = count.toString();
     exportButton.disabled = count === 0;
+    const list = el("recentRows");
+    if (rows.length === 0) {
+      const empty = document.createElement("li");
+      empty.className = "recent-empty";
+      empty.textContent = "尚無紀錄";
+      list.replaceChildren(empty);
+    } else {
+      list.replaceChildren(...rows.map((row) => {
+        const item = document.createElement("li");
+        const heading = document.createElement("div");
+        heading.className = "recent-row-head";
+        const time = document.createElement("time");
+        time.dateTime = row.recorded_at;
+        time.textContent = formatTaipeiTime(row.recorded_at).replace("T", " ").slice(0, 19);
+        const lux = document.createElement("strong");
+        lux.textContent = `${Number(row.lux).toFixed(2)} lux`;
+        const location = document.createElement("span");
+        location.className = "recent-location";
+        location.textContent = `${Number(row.latitude).toFixed(6)}, ${Number(row.longitude).toFixed(6)} · 誤差約 ${Math.round(row.accuracy_m)} 公尺`;
+        heading.append(time, lux);
+        item.append(heading, location);
+        return item;
+      }));
+    }
   } finally {
     db.close();
   }
@@ -204,7 +240,7 @@ async function recordOnce() {
       accuracy_m: latestPosition.coords.accuracy,
       lux: latestLux,
     });
-    await refreshCount();
+    await refreshArchive();
     message("已儲存最新一筆紀錄。");
   } catch (error) {
     stopRecording(`儲存失敗：${error.message}`);
@@ -264,4 +300,4 @@ startButton.addEventListener("click", startRecording);
 stopButton.addEventListener("click", () => stopRecording());
 exportButton.addEventListener("click", exportCsv);
 updateControls();
-refreshCount().catch((error) => message(`無法開啟手機資料庫：${error.message}`, true));
+refreshArchive().catch((error) => message(`無法開啟手機資料庫：${error.message}`, true));
