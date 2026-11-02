@@ -1,0 +1,10 @@
+{
+  "name": "light-map-data",
+  "private": true,
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "devDependencies": {
+    "wrangler": "^4.156.0"
+  }
+}
