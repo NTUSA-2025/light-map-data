@@ -134,6 +134,24 @@ footer { margin-top: 16px; padding: 12px 2px 0; border-top: 1px solid var(--line
   .recent-list { grid-template-columns: 1fr; }
 }
 
+@media (max-width: 720px) and (max-height: 700px) {
+  .shell { padding-top: 8px; }
+  .masthead { padding-bottom: 8px; }
+  .brand-mark { width: 34px; height: 34px; }
+  .brand h1 { font-size: 1.03rem; }
+  .dashboard { gap: 7px; margin-top: 8px; }
+  .hero { min-height: 132px; padding: 12px; }
+  .lux-line strong { font-size: clamp(2.7rem, 11vw, 3.8rem); }
+  .lux-line strong.compact { font-size: clamp(1.95rem, 7.5vw, 2.8rem); }
+  .panel { padding: 11px 13px; }
+  .location-panel { min-height: 86px; }
+  .location-content { margin-top: 5px; }
+  .record-hint { margin-top: 3px; }
+  .record-controls { margin-top: 8px; }
+  .archive { margin-top: 9px; padding-top: 8px; }
+  .message { margin-block: 8px; }
+}
+
 @media (max-width: 360px) {
   .shell { padding-inline: 12px; }
   .brand-kicker { font-size: .54rem; letter-spacing: .02em; }
