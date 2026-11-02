@@ -31,10 +31,60 @@ let saving = false;
 let clearing = false;
 let storedCount = 0;
 let mapLoading = false;
+let screenWakeLock = null;
+let screenWakeLockRequest = null;
 
 function message(text, error = false) {
   el("message").textContent = text;
   el("message").classList.toggle("error", error);
+}
+
+function setWakeStatus(text, state = "idle") {
+  const status = el("wakeStatus");
+  status.textContent = text;
+  status.classList.toggle("is-active", state === "active");
+  status.classList.toggle("error", state === "error");
+}
+
+async function keepScreenAwake() {
+  if (recordTimer === null || screenWakeLock || screenWakeLockRequest || document.visibilityState !== "visible") return;
+  if (!navigator.wakeLock?.request) {
+    setWakeStatus("此瀏覽器無法保持螢幕開啟，記錄時請勿鎖屏。", "error");
+    return;
+  }
+  setWakeStatus("正在要求保持螢幕開啟…");
+  let request;
+  try {
+    request = navigator.wakeLock.request("screen");
+    screenWakeLockRequest = request;
+    const lock = await request;
+    if (recordTimer === null || document.visibilityState !== "visible") {
+      await lock.release();
+      return;
+    }
+    if (lock.released) {
+      setWakeStatus("無法保持螢幕開啟，記錄時請勿鎖屏。", "error");
+      return;
+    }
+    screenWakeLock = lock;
+    lock.addEventListener("release", () => {
+      if (screenWakeLock !== lock) return;
+      screenWakeLock = null;
+      if (recordTimer !== null) setWakeStatus("螢幕保持功能已中斷，記錄時請勿鎖屏。", "error");
+    });
+    setWakeStatus("螢幕保持開啟中", "active");
+  } catch {
+    if (recordTimer !== null) setWakeStatus("無法保持螢幕開啟，記錄時請勿鎖屏。", "error");
+  } finally {
+    if (screenWakeLockRequest === request) screenWakeLockRequest = null;
+  }
+}
+
+function releaseScreenWakeLock() {
+  const lock = screenWakeLock;
+  screenWakeLock = null;
+  if (lock) void lock.release().catch(() => {});
+  setWakeStatus("開始記錄後會自動保持螢幕開啟。");
 }
 
 function updateControls() {
@@ -68,6 +118,7 @@ function stopRecording(reason = "已停止記錄。") {
   if (recordTimer !== null) {
     clearInterval(recordTimer);
     recordTimer = null;
+    releaseScreenWakeLock();
     message(reason);
   }
   updateControls();
@@ -317,6 +368,7 @@ function startRecording() {
   if (recordTimer !== null || !device?.gatt?.connected || latestLux === null || latestPosition === null) return;
   sessionId = new Date().toISOString();
   recordTimer = setInterval(recordOnce, Number(intervalSelect.value) * 1000);
+  void keepScreenAwake();
   updateControls();
   message("開始記錄；請保持手機頁面開啟。");
   void recordOnce();
@@ -387,5 +439,10 @@ locationPanel.addEventListener("click", (event) => {
   if (mapPanel.hidden && !event.target.closest("button")) void toggleMap();
 });
 recenterButton.addEventListener("click", () => coverageMap.recenter());
+document.addEventListener("visibilitychange", () => {
+  if (recordTimer === null) return;
+  if (document.visibilityState === "visible") void keepScreenAwake();
+  else setWakeStatus("網頁不在前景，返回後會重新嘗試保持螢幕開啟。", "error");
+});
 updateControls();
 refreshArchive().catch((error) => message(`無法開啟手機資料庫：${error.message}`, true));

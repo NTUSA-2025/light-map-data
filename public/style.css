@@ -120,6 +120,9 @@ select { width: 100%; height: 44px; padding: 0 25px 0 11px; appearance: none; bo
 select option { background: #0a1114; }
 .actions { display: grid; grid-template-columns: minmax(0, 1fr) 74px; gap: 8px; }
 .actions .button { padding-inline: 8px; }
+.wake-status { margin: 10px 0 0; color: var(--muted); font-size: .72rem; line-height: 1.4; }
+.wake-status.is-active { color: var(--cyan); }
+.wake-status.error { color: var(--orange); }
 .archive { flex-wrap: wrap; gap: 10px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--line); }
 .archive > div { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
 .archive-label { color: var(--muted); font-size: .71rem; }

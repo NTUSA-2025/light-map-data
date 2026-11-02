@@ -56,6 +56,7 @@
               <button id="stopButton" type="button" class="button button-outline" disabled>停止</button>
             </div>
           </div>
+          <p id="wakeStatus" class="wake-status" role="status" aria-live="polite">開始記錄後會自動保持螢幕開啟。</p>
           <div class="archive">
             <div><span class="archive-label">本機已儲存</span><strong><span id="rowCount">0</span> <small>筆紀錄</small></strong></div>
             <button id="exportButton" type="button" class="button button-export" disabled>匯出全部 CSV <span aria-hidden="true">↓</span></button>
@@ -68,7 +69,7 @@
         <ol id="recentRows" class="recent-list"><li class="recent-empty">尚無紀錄</li></ol>
       </section>
 
-      <footer>本頁採集的資料供台大夜間亮度地圖使用，不會自動上傳。請匯出 CSV 供後續整理；記錄時保持頁面開啟，手機鎖屏可能中斷接收。</footer>
+      <footer>本頁採集的資料供台大夜間亮度地圖使用，不會自動上傳。請匯出 CSV 供後續整理；記錄時會嘗試保持螢幕開啟，仍請保持頁面在前景，手動鎖屏可能中斷接收。</footer>
     </main>
   </body>
 </html>
