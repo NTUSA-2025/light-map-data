@@ -3,28 +3,29 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#f5f3ed">
+    <meta name="theme-color" content="#070a0d">
     <meta name="description" content="採集台大校園的照度與位置，供台大夜間亮度地圖使用。">
     <title>照度資料採集｜台大夜間亮度地圖</title>
+    <link rel="icon" href="logo.png" type="image/png">
     <link rel="stylesheet" href="style.css">
     <script src="app.js" defer></script>
   </head>
   <body>
     <main class="shell">
       <header class="masthead">
-        <div class="brand"><span class="brand-mark" aria-hidden="true">✳</span><div><h1>照度資料採集</h1><span>台大夜間亮度地圖 <span class="brand-separator">/</span> 實測資料來源</span></div></div>
-        <span class="project-tag">ESP32 × VEML7700</span>
+        <div class="brand"><img class="brand-mark" src="logo.png" alt=""><div><span class="brand-kicker">NTU NIGHT LIGHT MAP / FIELD DATA</span><h1>照度資料採集</h1></div></div>
+        <span class="project-tag">ESP32 <span aria-hidden="true">/</span> VEML7700</span>
       </header>
 
       <div class="dashboard">
         <section class="hero" aria-labelledby="luxHeading">
-          <div class="hero-top"><h2 id="luxHeading">現場照度 <span class="live-dot" aria-hidden="true"></span></h2><span id="bleStatus" class="hero-status">尚未連線</span></div>
+          <div class="hero-top"><h2 id="luxHeading"><span class="card-number">01</span> 現場照度 <span class="live-dot" aria-hidden="true"></span></h2><span id="bleStatus" class="hero-status">尚未連線</span></div>
           <div class="lux-line"><strong id="luxValue">—</strong><span>lux</span></div>
           <button id="connectButton" type="button" class="button button-bright"><span id="connectLabel">連接 ESP32_LUX</span><span aria-hidden="true">↗</span></button>
         </section>
 
         <section class="panel location-panel" aria-labelledby="locationHeading">
-          <div class="panel-head"><h2 id="locationHeading">採集位置</h2><span id="locationStatus" class="status-pill">尚未取得</span></div>
+          <div class="panel-head"><h2 id="locationHeading"><span class="card-number">02</span> 採集位置</h2><span id="locationStatus" class="status-pill">尚未取得</span></div>
           <div class="location-content">
             <p id="coordinates" class="detail">啟用定位，為每筆照度紀錄加上座標。</p>
             <button id="locationButton" type="button" class="button button-outline"><span id="locationLabel">啟用定位</span><span aria-hidden="true">↗</span></button>
@@ -32,7 +33,7 @@
         </section>
 
         <section class="panel record-panel" aria-labelledby="recordHeading">
-          <div class="panel-head"><h2 id="recordHeading">採集紀錄</h2><span id="recordStatus" class="status-pill">未開始</span></div>
+          <div class="panel-head"><h2 id="recordHeading"><span class="card-number">03</span> 採集紀錄</h2><span id="recordStatus" class="status-pill">未開始</span></div>
           <p id="recordHint" class="record-hint">連接照度計並啟用定位後即可開始。</p>
           <div class="record-controls">
             <div class="interval-field"><label for="intervalSelect">紀錄間隔</label><div class="select-wrap"><select id="intervalSelect">
