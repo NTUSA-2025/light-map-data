@@ -35,9 +35,17 @@ function updateControls() {
   stopButton.disabled = !recording;
   intervalSelect.disabled = recording;
   connectButton.disabled = connected;
+  locationButton.disabled = locationWatchId !== null;
   el("connectLabel").textContent = connected ? "已連接 ESP32_LUX" : "連接 ESP32_LUX";
+  el("locationLabel").textContent = locationWatchId === null ? "啟用定位" : latestPosition === null ? "定位中…" : "定位已啟用";
   el("bleStatus").textContent = connected ? "已連線" : "尚未連線";
   el("recordStatus").textContent = recording ? "記錄中" : "未開始";
+  let recordHint = "已準備好採集照度與位置。";
+  if (recording) recordHint = "正在採集，請保持頁面開啟。";
+  else if (!connected) recordHint = "連接照度計並啟用定位後即可開始。";
+  else if (latestPosition === null) recordHint = "啟用手機定位後即可開始。";
+  else if (latestLux === null) recordHint = "等待照度計傳來數值。";
+  el("recordHint").textContent = recordHint;
   el("bleStatus").classList.toggle("is-active", connected);
   el("recordStatus").classList.toggle("is-active", recording);
   el("locationStatus").classList.toggle("is-active", latestPosition !== null);
@@ -124,11 +132,13 @@ function enableLocation() {
       navigator.geolocation.clearWatch(locationWatchId);
       locationWatchId = null;
       el("locationStatus").textContent = "無法定位";
+      el("coordinates").textContent = "無法取得目前位置，請重新啟用定位。";
       message(`定位失敗：${error.message}`, true);
       updateControls();
     },
     { enableHighAccuracy: true, maximumAge: 5000, timeout: 15000 },
   );
+  updateControls();
 }
 
 function openDatabase() {
