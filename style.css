@@ -104,8 +104,9 @@ select option { background: #0a1114; }
 .archive strong { color: var(--cyan); font-family: var(--mono); font-size: 1.4rem; font-weight: 500; letter-spacing: -.05em; white-space: nowrap; }
 .archive small { color: var(--muted); font-family: var(--font); font-size: .68rem; font-weight: 500; letter-spacing: normal; }
 
-.message { min-height: 22px; margin: 12px 2px; color: var(--cyan); font-size: .8rem; font-weight: 600; line-height: 1.5; }
-.message.error { color: var(--orange); }
+.message { margin: 10px 0 -6px; padding: 7px 10px; border-left: 2px solid var(--cyan); color: var(--cyan); background: #9ce7d80c; font-size: .78rem; font-weight: 600; line-height: 1.45; }
+.message:empty { display: none; }
+.message.error { border-color: var(--orange); color: var(--orange); background: #f0997b0c; }
 .recent-records { padding-top: 18px; }
 .recent-head { gap: 12px; flex-wrap: wrap; }
 .section-kicker { color: var(--orange); font-family: var(--mono); font-size: .64rem; font-weight: 500; letter-spacing: .1em; }
@@ -149,7 +150,7 @@ footer { margin-top: 16px; padding: 12px 2px 0; border-top: 1px solid var(--line
   .record-hint { margin-top: 3px; }
   .record-controls { margin-top: 8px; }
   .archive { margin-top: 9px; padding-top: 8px; }
-  .message { margin-block: 8px; }
+  .message { margin: 8px 0 -3px; }
 }
 
 @media (max-width: 360px) {
